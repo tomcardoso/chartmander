@@ -40,9 +40,7 @@ function getChart(chartId, channel) {
       chartEntry.slug = jsonBody.slug;
       chartEntry.heading = jsonBody.heading;
       chartEntry.id = jsonBody._id;
-      // debugger;
       upload(chartEntry.img.split(',')[1], function(err, res) {
-        debugger;
         postMessage(chartEntry, res.data.link, channel)
       });
 
@@ -58,7 +56,6 @@ function upload(image, callback) {
     }
   };
   var post = request.post(options, function(err, req, body) {
-    debugger;
     try {
       callback(err, JSON.parse(body));
     } catch (e) {
