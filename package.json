@@ -20,9 +20,11 @@
     "bot"
   ],
   "dependencies": {
-    "ws": "*",
-    "request": "*",
+    "eventemitter3": "*",
     "jethro": "*",
-    "eventemitter3": "*"
-  }
+    "request": "*",
+    "slackbotapi": "^1.3.5",
+    "ws": "*"
+  },
+  "devDependencies": {}
 }

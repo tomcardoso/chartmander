@@ -9,7 +9,8 @@
 //////////////////////////////////////////////////////////////////
 
 // Requiring our module
-var slackAPI = require('./index');
+var slackAPI = require('slackbotapi');
+var request = require("request");
 
 // Starting
 var slack = new slackAPI({
@@ -17,10 +18,7 @@ var slack = new slackAPI({
   'logging': true
 });
 
-var request = require("request");
-
 var imgurId = "9e5302004a1b093";
-var channel;
 
 var address = "http://charts.colo.theglobeandmail.com";
 
@@ -42,7 +40,9 @@ function getChart(chartId, channel) {
       chartEntry.slug = jsonBody.slug;
       chartEntry.heading = jsonBody.heading;
       chartEntry.id = jsonBody._id;
+      // debugger;
       upload(chartEntry.img.split(',')[1], function(err, res) {
+        debugger;
         postMessage(chartEntry, res.data.link, channel)
       });
 
@@ -58,6 +58,7 @@ function upload(image, callback) {
     }
   };
   var post = request.post(options, function(err, req, body) {
+    debugger;
     try {
       callback(err, JSON.parse(body));
     } catch (e) {
@@ -74,7 +75,7 @@ function postMessage(chartEntry, imgurLink, channel) {
   var message = "*Heading:* " + chartEntry.heading + "\n";
   message += "*Slug:* _" + chartEntry.slug + "_\n";
   message += "*Link:* " + address + "/chart/edit/" + chartEntry.id + "\n";
-  message += "*Thumbnail:* :chart_with_upwards_trend: :chart_with_upwards_trend: :chart_with_upwards_trend: " + imgurLink + "\n";
+  message += "*Thumbnail:* " + imgurLink + "\n";
 
   return slack.sendMsg(channel, message);
 }
