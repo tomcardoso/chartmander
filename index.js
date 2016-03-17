@@ -11,7 +11,7 @@
 // Requiring our module
 var slackAPI = require('slackbotapi'),
     request = require("request"),
-    config = require("./.config.json");
+    config = require("./config.json");
 
 // Starting
 var slack = new slackAPI({
