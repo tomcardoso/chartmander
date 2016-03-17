@@ -2,6 +2,9 @@
 
 A slackbot that [replies with a summary](https://twitter.com/tom_cardoso/status/626488575706722304), based on a [Chart Tool](http://www.github.com/globeandmail/chart-tool) chart link.
 
+![Charmander](http://vignette1.wikia.nocookie.net/pokemon/images/9/96/004Charmander_OS_anime.png/revision/latest?cb=20140603214902)
+
+
 ## Setup
 
 You'll need a Slack API token, the address to your Chart Tool install, and optionally an imgur ID (assuming you don't have AWS upload enabled).
