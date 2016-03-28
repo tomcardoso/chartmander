@@ -2,7 +2,7 @@
   "name": "chartmander",
   "version": "1.3.2",
   "description": "a node.js bot to expand Chart Tool links",
-  "main": "chartmander.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "node chartmander.js"
