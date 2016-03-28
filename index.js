@@ -11,30 +11,22 @@
 // Requiring our module
 var slackAPI = require('slackbotapi'),
     request = require("request"),
+    isURL = require("is-url"),
     config = require("./config.json");
 
-// Starting
-var slack = new slackAPI({
-  'token': config.token,
-  'logging': true
-});
+// Starting up the bot
+var slack = new slackAPI({ 'token': config.token, 'logging': true, 'autoReconnect': true });
 
-var useImgur,
-    imgurId,
-    channel;
+var useImgur, channel;
 
-if (!config.imgur) {
-  useImgur = true;
-} else {
-  imgurId = config.imgur,
-}
+var now = new Date().getTime(); // grab a timestamp from when bot first started
 
-var address = config.address;
+if (config.imgur) { useImgur = true; }
 
 function getChart(chartId, channel) {
 
   var chartOptions = {
-    uri: address + "/api/get/" + chartId,
+    uri: config.address + "/api/get/" + chartId,
     method: "GET",
     timeout: 10000,
     followRedirect: true,
@@ -42,21 +34,22 @@ function getChart(chartId, channel) {
   };
 
   request(chartOptions, function chartResponse(error, response, body) {
-    if (!error && response.statusCode == 200) {
+    if (!error && response.statusCode == 200 && body !== '') {
       var jsonBody = JSON.parse(body);
       var chartEntry = {};
       chartEntry.img = jsonBody.img;
       chartEntry.slug = jsonBody.slug;
       chartEntry.heading = jsonBody.heading;
       chartEntry.id = jsonBody._id;
-      if (useImgur) {
+      if (isURL(chartEntry.img)) {
+        postMessage(chartEntry, chartEntry.img, channel);
+      } else if (config.imgur && config.imgur !== "") {
         upload(chartEntry.img.split(',')[1], function(err, res) {
           postMessage(chartEntry, res.data.link, channel);
         });
       } else {
-        postMessage(chartEntry, chartEntry.img, channel);
+       console.log("No Imgur API key found!");
       }
-
     }
   });
 }
@@ -65,7 +58,7 @@ function upload(image, callback) {
   var options = {
     url: 'https://api.imgur.com/3/upload',
     headers: {
-      'Authorization': 'Client-ID ' + imgurId
+      'Authorization': 'Client-ID ' + config.imgur
     }
   };
   var post = request.post(options, function(err, req, body) {
@@ -84,7 +77,7 @@ function postMessage(chartEntry, imageLink, channel) {
 
   var message = "*Heading:* " + chartEntry.heading + "\n";
   message += "*Slug:* _" + chartEntry.slug + "_\n";
-  message += "*Link:* " + address + "/chart/edit/" + chartEntry.id + "\n";
+  message += "*Link:* " + config.address + "/chart/edit/" + chartEntry.id + "\n";
   message += "*Thumbnail:* :chart_with_upwards_trend: :chart_with_upwards_trend: :chart_with_upwards_trend: " + imageLink + "\n";
 
   return slack.sendMsg(channel, message);
@@ -92,26 +85,17 @@ function postMessage(chartEntry, imageLink, channel) {
 
 slack.on('message', function(data) {
 
-  if (typeof data.text == 'undefined') { return };
+  var timeCheck = 0 < ((new Date(Date(data.ts)).getTime() - now) < 5000);
 
-  var re = /(?:edit|show)\/([^\s]*)\//g,
-        str = data.text,
-        match,
-        results = [],
-        charts = [];
+  if (typeof data.text === 'undefined' || timeCheck) { return };
 
-  var results = str.match(re);
+  var re = new RegExp("(?:edit|show)\/([0-9A-Za-z]*)", 'g'),
+    str = data.text,
+    results;
 
-  if (results && results.length) {
-    for (var i = results.length - 1; i >= 0; i--) {
-      var result = results[i].match(/(?:edit|show)\/([^\s]*)\//i)[1];
-      charts.push(result);
-    }
-
-    for (var i = charts.length - 1; i >= 0; i--) {
-      (function(chartEntry) {
-        getChart(chartEntry, data.channel);
-      })(charts[i]);
+  while ((results = re.exec(str)) !== null) {
+    if (results[1]) {
+      getChart(results[1], data.channel);
     }
   }
 

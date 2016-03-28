@@ -7,15 +7,15 @@ A slackbot that [replies with a summary](https://twitter.com/tom_cardoso/status/
 
 ## Setup
 
-You'll need a Slack API token, the address to your Chart Tool install, and optionally an imgur ID (assuming you don't have AWS upload enabled).
+You'll need a Slack API token, the address to your Chart Tool install, and optionally an [Imgur API ID](https://api.imgur.com/oauth2/addclient) (assuming you don't have AWS upload enabled).
 
 Once you have those, create a `config.json` in the main Chartmander directory and fill it in like so:
 
 ```
 {
   "token": "token goes here",
-  "imgur": "optional imgur ID, leave this as false if you have AWS image upload enabled",
-  "address": "http://charts.theglobeandmail.com/or-whatever"
+  "imgur": "optional imgur ID, leave this empty if you have AWS image upload enabled",
+  "address": "http://charts.example.com/"
 }
 ```
 
