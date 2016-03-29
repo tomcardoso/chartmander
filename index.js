@@ -89,7 +89,7 @@ slack.on('message', function(data) {
 
   if (typeof data.text === 'undefined' || timeCheck) { return };
 
-  var re = new RegExp("(?:edit|show)\/([0-9A-Za-z]*)", 'g'),
+  var re = new RegExp("(?:chart\/edit|chart\/pdf|chart|api\/get)\/([0-9A-Za-z]*)", 'g'),
     str = data.text,
     results;
 
